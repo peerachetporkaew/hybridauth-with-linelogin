@@ -2,12 +2,16 @@
 include 'vendor/autoload.php';
 use Hybridauth\Hybridauth;
 use Hybridauth\HttpClient;
+use Hybridauth\Storage\Session;
+
+session_start();
+
 $config = [
     'callback' => HttpClient\Util::getCurrentUrl(),
     'providers' => [
-        'Line' => [ 
+        'Line' => [
             'enabled' => true,
-            'keys'    => [ 'id' => '', 'secret' => '' ], 
+            'keys'    => [ 'id' => 'xxx', 'secret' => 'xxx'],
         ],
     ],
 ];
@@ -16,9 +20,14 @@ try {
     $adapter = $hybridauth->authenticate( 'Line' );
     $tokens = $adapter->getAccessToken();
     $userProfile = $adapter->getUserProfile();
-    // print_r( $tokens );
+    print_r( $tokens );
     print_r( $userProfile );
-    $adapter->disconnect();
+
+    $storage = new Session;
+    $storage->set("access_token",$tokens["access_token"]);
+
+header("Location: view.php");
+die();
 }
 catch (\Exception $e) {
     echo $e->getMessage();
